@@ -6,11 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-"scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1"
-}
-
-
 jobs:
   build:
 
@@ -32,18 +27,20 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    # Optional Lint Step
     - name: Run Lint (Optional)
       run: npm run lint
       continue-on-error: true
 
-    - name: Run Tests (Optional)
+    # Test Step with Mocha
+    - name: Run Tests
       run: npm test
 
-    - name: Run the Application
+    # Run the Application and Test Endpoints with curl
+    - name: Run the Application and Test Routes
       run: |
         npm start &
         sleep 10 # Wait for the server to start
         curl -v http://localhost:8081/home
         curl -v http://localhost:8081/profile
         curl -X POST -H "Content-Type: application/json" -d '{"username": "bret", "password": "bret@123"}' http://localhost:8081/login
-
