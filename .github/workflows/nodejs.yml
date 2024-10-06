@@ -1,0 +1,44 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Lint (Optional)
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Run Tests (Optional)
+      run: npm test
+
+    - name: Run the Application
+      run: |
+        npm start &
+        sleep 10 # Wait for the server to start
+        curl -v http://localhost:8081/home
+        curl -v http://localhost:8081/profile
+        curl -X POST -H "Content-Type: application/json" -d '{"username": "bret", "password": "bret@123"}' http://localhost:8081/login
+
